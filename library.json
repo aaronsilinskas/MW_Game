@@ -1,0 +1,29 @@
+{
+    "name": "MW_Game",
+    "version": "0.0.1",
+    "keywords": [
+        "mindwidgets", "game", "quest", "arduino"
+    ],
+    "description": "[EXPERIMENTAL] MindWidgets Game Library.",
+    "frameworks": [
+        "arduino"
+    ],
+    "platforms": [
+        "atmelsam"
+    ],
+    "authors": [
+        {
+            "email": "aaron@mindwidgets.com",
+            "url": "https://github.com/aaronsilinskas/MW_Game",
+            "maintainer": true,
+            "name": "Aaron Silinskas"
+        }
+    ],
+    "export": {
+        "include": [
+            "src",
+            "examples"
+        ],
+        "exclude": null
+    }
+}

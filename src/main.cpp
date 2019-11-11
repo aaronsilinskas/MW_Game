@@ -107,4 +107,8 @@ void loop()
 {
     timeEllapsed(&time);
     lampBurnsMagic(&lamp, &fuel, &time);
+
+    Serial.printf("Fuel remaining: %d\n", fuel.amount);
+
+    delay(500);
 }

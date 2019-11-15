@@ -89,6 +89,7 @@ Magic fuel{
     .type = Fire,
     .amount = 1000};
 
+#define NEOPIXEL_PIN 5
 #define NEOPIXEL_COUNT 3
 CRGB neopixels[NEOPIXEL_COUNT]; // = {CRGB::Red, CRGB::Green, CRGB::Blue};
 
@@ -102,7 +103,7 @@ void setup()
 
     randomSeed(micros());
 
-    setupNeopixels(neopixels, NEOPIXEL_COUNT, true, 32);
+    setupNeopixels<NEOPIXEL_PIN>(neopixels, NEOPIXEL_COUNT, true, 32);
 }
 
 void loop()

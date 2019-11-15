@@ -1,14 +1,5 @@
 #include "pixels.h"
 
-void setupNeopixels(CRGB *pixels, int count, bool dither, uint8_t brightness)
-{
-    FastLED.addLeds<NEOPIXEL, MWPIN_NEOPIXEL>(pixels, count);
-    FastLED.setCorrection(TypicalLEDStrip);
-    FastLED.setDither(dither ? 1 : 0);
-    FastLED.setBrightness(brightness);
-    FastLED.show();
-}
-
 void printColor(Stream *out, CRGB *color)
 {
     out->printf("{r:%d g:%d b:%d}", color->r, color->g, color->b);

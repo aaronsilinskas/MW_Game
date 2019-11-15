@@ -1,30 +1,7 @@
 /* lamp.cpp Example sketch for a lamp
- *
- * Entity - Lamp
-
-Components
-
-- IR
-- Events
-- Lights (FastLED dep)
-  - NeoPixels
-- Sound
-  - Piezo
-- Input
-  - Piezo
-- Flame
-  - Lights
-  - Sound
-
-Behaviors
-
-- FlameOn(Flame)
-- FlameOff(Flame)
-- FlameUpdate(Flame)
--
-
  */
 #include <Arduino.h>
+#include <FastLED.h>
 
 /////////////////////////// State
 
@@ -33,12 +10,6 @@ typedef struct Time
     uint64_t currentTimeMs;
     uint64_t ellapsedMs;
 } Time;
-
-void setupTime(Time *time)
-{
-    time->currentTimeMs = millis();
-    time->ellapsedMs = 0;
-}
 
 typedef enum MagicType
 {
@@ -49,18 +20,27 @@ typedef enum MagicType
     Lightning
 } MagicType;
 
+typedef uint32_t MagicAmount;
+
 typedef struct Magic
 {
     MagicType type;
-    uint32_t amount;
+    MagicAmount amount;
 
 } Magic;
 
-typedef struct Lamp
+typedef struct Flame
 {
     bool lit;
-    uint32_t magicPerSecond;
-} Lamp;
+    uint8_t brightness;
+    MagicAmount burnedPerSecond;
+} Flame;
+
+typedef struct Pixels
+{
+    uint16_t count;
+    CRGB *colors;
+} Pixels;
 
 /////////////////////////// Behaviors
 // should only take structs, no primitives
@@ -69,44 +49,104 @@ typedef struct Lamp
 void timeEllapsed(Time *time)
 {
     uint64_t updatedTimeMs = millis();
-    time->ellapsedMs = updatedTimeMs - time->currentTimeMs;
-    time->currentTimeMs = updatedTimeMs;
+    if (time->currentTimeMs == 0)
+    {
+        time->currentTimeMs = updatedTimeMs;
+        time->ellapsedMs = 0;
+    }
+    else
+    {
+        time->ellapsedMs = updatedTimeMs - time->currentTimeMs;
+        time->currentTimeMs = updatedTimeMs;
+    }
 }
 
-void lampBurnsMagic(Lamp *lamp, Magic *fuel, Time *time)
+void flameBurnsMagic(Flame *flame, Magic *fuel, Time *time)
 {
-    if (!lamp->lit)
+    if (!flame->lit)
     {
         return;
     }
-    uint64_t fuelBurned = lamp->magicPerSecond * time->ellapsedMs / 1000;
-    fuel->amount -= fuelBurned;
+    uint64_t fuelBurned = flame->burnedPerSecond * time->ellapsedMs / 1000;
+    if (fuel->amount > fuelBurned)
+    {
+        fuel->amount -= fuelBurned;
+    }
+    else
+    {
+        fuel->amount = 0;
+        flame->lit = false;
+    }
+}
+
+void flameBrightnessFlickers(Flame *flame, Time *time)
+{
+    if (flame->lit)
+    {
+        if (flame->brightness < 255)
+        {
+            uint32_t brighten = 255 * time->ellapsedMs / 2000;
+            if (flame->brightness + brighten < 255)
+            {
+                flame->brightness += brighten;
+            }
+            else
+            {
+                flame->brightness = 255;
+            }
+        }
+        else
+        {
+            flame->brightness -= random(128);
+        }
+    }
+    else if (flame->brightness > 0)
+    {
+        uint32_t dim = 255 * time->ellapsedMs / 5000; // go out in 5 seconds
+        if (flame->brightness > dim)
+        {
+            flame->brightness -= dim;
+        }
+        else
+        {
+            flame->brightness = 0;
+        }
+    }
+}
+
+void flameOnPixels(Flame *flame, Pixels *pixels, Time *time)
+{
 }
 
 /////////////////////////// Entity
 
 Time time;
 
-Lamp lamp{
+Flame flame{
     .lit = true,
-    .magicPerSecond = 5};
+    .brightness = 0,
+    .burnedPerSecond = 5};
 
 Magic fuel{
     .type = Fire,
     .amount = 1000};
 
+Pixels flamePixels{
+    .count = 12,
+    .colors = (CRGB *)malloc(12 * sizeof(CRGB))};
+
 void setup()
 {
     Serial.begin(9600);
 
-    // TODO manually wire up behaviors with structs and manually execute in order?
-    setupTime(&time);
+    randomSeed(micros());
 }
 
 void loop()
 {
     timeEllapsed(&time);
-    lampBurnsMagic(&lamp, &fuel, &time);
+    flameBurnsMagic(&flame, &fuel, &time);
+    flameBrightnessFlickers(&flame, &time);
 
     Serial.printf("Fuel remaining: %d\n", fuel.amount);
 

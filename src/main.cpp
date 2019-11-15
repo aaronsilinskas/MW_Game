@@ -1,33 +1,11 @@
 /* lamp.cpp Example sketch for a lamp
  */
 #include <Arduino.h>
+#include <mw/time.h>
+#include <mw/magic.h>
 #include <FastLED.h>
 
 /////////////////////////// State
-
-typedef struct Time
-{
-    uint64_t currentTimeMs;
-    uint64_t ellapsedMs;
-} Time;
-
-typedef enum MagicType
-{
-    Fire,
-    Water,
-    Air,
-    Earth,
-    Lightning
-} MagicType;
-
-typedef uint32_t MagicAmount;
-
-typedef struct Magic
-{
-    MagicType type;
-    MagicAmount amount;
-
-} Magic;
 
 typedef struct Flame
 {
@@ -45,21 +23,6 @@ typedef struct Pixels
 /////////////////////////// Behaviors
 // should only take structs, no primitives
 // main state should be first word for easier discovery
-
-void timeEllapsed(Time *time)
-{
-    uint64_t updatedTimeMs = millis();
-    if (time->currentTimeMs == 0)
-    {
-        time->currentTimeMs = updatedTimeMs;
-        time->ellapsedMs = 0;
-    }
-    else
-    {
-        time->ellapsedMs = updatedTimeMs - time->currentTimeMs;
-        time->currentTimeMs = updatedTimeMs;
-    }
-}
 
 void flameBurnsMagic(Flame *flame, Magic *fuel, Time *time)
 {

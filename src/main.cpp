@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <mw/time.h>
 #include <mw/magic.h>
-#include <FastLED.h>
+#include <mw/pixels.h>
 
 /////////////////////////// State
 
@@ -13,12 +13,6 @@ typedef struct Flame
     uint8_t brightness;
     MagicAmount burnedPerSecond;
 } Flame;
-
-typedef struct Pixels
-{
-    uint16_t count;
-    CRGB *colors;
-} Pixels;
 
 /////////////////////////// Behaviors
 // should only take structs, no primitives
@@ -94,9 +88,12 @@ Magic fuel{
     .type = Fire,
     .amount = 1000};
 
+#define NEOPIXEL_COUNT 3
+CRGB neopixels[NEOPIXEL_COUNT] = {CRGB::Red, CRGB::Green, CRGB::Blue};
+
 Pixels flamePixels{
-    .count = 12,
-    .colors = (CRGB *)malloc(12 * sizeof(CRGB))};
+    .count = NEOPIXEL_COUNT,
+    .colors = neopixels};
 
 void setup()
 {
@@ -113,5 +110,7 @@ void loop()
 
     Serial.printf("Fuel remaining: %d\n", fuel.amount);
 
-    delay(500);
+    printPixels(&Serial, &flamePixels);
+
+    delay(750);
 }

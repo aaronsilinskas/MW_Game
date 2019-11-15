@@ -36,7 +36,7 @@ void flameBurnsMagic(Flame *flame, Magic *fuel, Time *time)
     }
 }
 
-void flameBrightnessFlickers(Flame *flame, Time *time)
+void flameBrightnessChanges(Flame *flame, Time *time)
 {
     if (flame->lit)
     {
@@ -73,6 +73,7 @@ void flameBrightnessFlickers(Flame *flame, Time *time)
 
 void flameOnPixels(Flame *flame, Pixels *pixels, Time *time)
 {
+    printPixels(&Serial, pixels);
 }
 
 /////////////////////////// Entity
@@ -89,7 +90,7 @@ Magic fuel{
     .amount = 1000};
 
 #define NEOPIXEL_COUNT 3
-CRGB neopixels[NEOPIXEL_COUNT] = {CRGB::Red, CRGB::Green, CRGB::Blue};
+CRGB neopixels[NEOPIXEL_COUNT]; // = {CRGB::Red, CRGB::Green, CRGB::Blue};
 
 Pixels flamePixels{
     .count = NEOPIXEL_COUNT,
@@ -100,17 +101,18 @@ void setup()
     Serial.begin(9600);
 
     randomSeed(micros());
+
+    setupNeopixels(neopixels, NEOPIXEL_COUNT, true, 32);
 }
 
 void loop()
 {
     timeEllapsed(&time);
     flameBurnsMagic(&flame, &fuel, &time);
-    flameBrightnessFlickers(&flame, &time);
+    flameBrightnessChanges(&flame, &time);
+    flameOnPixels(&flame, &flamePixels, &time);
 
     Serial.printf("Fuel remaining: %d\n", fuel.amount);
-
-    printPixels(&Serial, &flamePixels);
 
     delay(750);
 }

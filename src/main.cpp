@@ -73,6 +73,10 @@ void flameBrightnessChanges(Flame *flame, Time *time)
 
 void flameOnPixels(Flame *flame, Pixels *pixels, Time *time)
 {
+    pixels->colors[0] = CRGB::Red;
+    pixels->colors[1] = CRGB::Green;
+    pixels->colors[2] = CRGB::Blue;
+
     printPixels(&Serial, pixels);
 }
 
@@ -90,12 +94,12 @@ Magic fuel{
     .amount = 1000};
 
 #define NEOPIXEL_PIN 5
-#define NEOPIXEL_COUNT 3
-CRGB neopixels[NEOPIXEL_COUNT]; // = {CRGB::Red, CRGB::Green, CRGB::Blue};
+#define NEOPIXEL_COUNT 12
+CRGB neopixels[NEOPIXEL_COUNT]; //  = {CRGB::Red, CRGB::Green, CRGB::Blue};
 
 Pixels flamePixels{
-    .count = NEOPIXEL_COUNT,
-    .colors = neopixels};
+    .count = 3,
+    .colors = &neopixels[3]}; // we can select subsets of pixels like this
 
 void setup()
 {
@@ -113,7 +117,9 @@ void loop()
     flameBrightnessChanges(&flame, &time);
     flameOnPixels(&flame, &flamePixels, &time);
 
-    Serial.printf("Fuel remaining: %d\n", fuel.amount);
+    printMagic(&Serial, "Fuel remaining", &fuel);
+
+    FastLED.show();
 
     delay(750);
 }

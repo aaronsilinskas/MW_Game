@@ -12,6 +12,8 @@ typedef enum MagicType
     Lightning
 } MagicType;
 
+const char *magicTypeName(MagicType type);
+
 typedef uint32_t MagicAmount;
 
 typedef struct Magic
@@ -20,5 +22,7 @@ typedef struct Magic
     MagicAmount amount;
 
 } Magic;
+
+void printMagic(Stream *out, const char *name, Magic *magic);
 
 #endif

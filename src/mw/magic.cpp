@@ -14,9 +14,8 @@ const char *magicTypeName(MagicType type)
         return "Earth";
     case Lightning:
         return "Lightning";
-    default:
-        return "Unknown";
     }
+    return "Unknown";
 }
 
 void printMagic(Stream *out, const char *name, Magic &magic)

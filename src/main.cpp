@@ -71,9 +71,9 @@ void flameBrightnessChanges(Flame *flame, Time &time)
     }
 }
 
-void flameOnPixel(Flame &flame, Pixels *pixels, int index)
+void flameOnPixel(Flame &flame, CRGB &color, Pixels *pixels, int index)
 {
-    pixels->colors[index] = CRGB::Yellow;
+    pixels->colors[index] = color;
     pixels->colors[index] = pixels->colors[index].nscale8(flame.brightness);
 }
 
@@ -112,7 +112,8 @@ void loop()
     timeEllapsed(&time);
     flameBurnsMagic(&flame, &fuel, time);
     flameBrightnessChanges(&flame, time);
-    flameOnPixel(flame, &flamePixels, 0);
+    CRGB flameColor = colorFromMagic(fuel);
+    flameOnPixel(flame, flameColor, &flamePixels, 0);
 
     EVERY_N_MILLIS(750)
     {

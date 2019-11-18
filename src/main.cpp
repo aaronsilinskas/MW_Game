@@ -11,7 +11,7 @@ typedef struct Flame
 {
     bool lit;
     uint8_t brightness;
-    MagicAmount burnedPerSecond;
+    MagicAmount burnedPerMs;
 } Flame;
 
 /////////////////////////// Behaviors
@@ -24,7 +24,7 @@ void flameBurnsMagic(Flame *flame, Magic *fuel, Time *time)
     {
         return;
     }
-    uint64_t fuelBurned = flame->burnedPerSecond * time->ellapsedMs / 1000;
+    uint64_t fuelBurned = flame->burnedPerMs * time->ellapsedMs;
     if (fuel->amount > fuelBurned)
     {
         fuel->amount -= fuelBurned;
@@ -42,7 +42,7 @@ void flameBrightnessChanges(Flame *flame, Time *time)
     {
         if (flame->brightness < 255)
         {
-            uint32_t brighten = 255 * time->ellapsedMs / 2000;
+            uint32_t brighten = 255 * time->ellapsedMs / 1000;
             if (flame->brightness + brighten < 255)
             {
                 flame->brightness += brighten;
@@ -54,7 +54,7 @@ void flameBrightnessChanges(Flame *flame, Time *time)
         }
         else
         {
-            flame->brightness -= random(128);
+            flame->brightness -= random(192);
         }
     }
     else if (flame->brightness > 0)
@@ -73,11 +73,10 @@ void flameBrightnessChanges(Flame *flame, Time *time)
 
 void flameOnPixels(Flame *flame, Pixels *pixels, Time *time)
 {
-    pixels->colors[0] = CRGB::Red;
-    pixels->colors[1] = CRGB::Green;
-    pixels->colors[2] = CRGB::Blue;
-
-    printPixels(&Serial, pixels);
+    for (int i = 0; i < pixels->count; i++) {
+        pixels->colors[i] = CRGB::Yellow;
+    }
+    nscale8(pixels->colors, pixels->count, flame->brightness);
 }
 
 /////////////////////////// Entity
@@ -87,14 +86,14 @@ Time time;
 Flame flame{
     .lit = true,
     .brightness = 0,
-    .burnedPerSecond = 5};
+    .burnedPerMs = 1};
 
 Magic fuel{
     .type = Fire,
-    .amount = 1000};
+    .amount = 5000};
 
 #define NEOPIXEL_PIN 5
-#define NEOPIXEL_COUNT 12
+const uint16_t NEOPIXEL_COUNT = 12;
 CRGB neopixels[NEOPIXEL_COUNT]; //  = {CRGB::Red, CRGB::Green, CRGB::Blue};
 
 Pixels flamePixels{
@@ -117,9 +116,13 @@ void loop()
     flameBrightnessChanges(&flame, &time);
     flameOnPixels(&flame, &flamePixels, &time);
 
-    printMagic(&Serial, "Fuel remaining", &fuel);
+    EVERY_N_MILLIS(750)
+    {
+        printMagic(&Serial, "Fuel remaining", &fuel);
+    }
 
     FastLED.show();
 
-    delay(750);
+    FastLED.delay(20);
+    //FastLED.delay(750);
 }

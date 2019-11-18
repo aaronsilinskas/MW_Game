@@ -81,20 +81,22 @@ void flameOnPixel(Flame &flame, Pixels *pixels, int index)
 
 Time time;
 
-const uint8_t FLAME_COUNT = 3;
-Flame flames[FLAME_COUNT];
+Flame flame{
+    .lit = true,
+    .brightness = 0,
+    .burnedPerMs = 1};
 
 Magic fuel{
     .type = Fire,
-    .amount = 15000 * FLAME_COUNT};
+    .amount = 10000};
 
 #define NEOPIXEL_PIN 5
 const uint16_t NEOPIXEL_COUNT = 12;
-CRGB neopixels[NEOPIXEL_COUNT]; //  = {CRGB::Red, CRGB::Green, CRGB::Blue};
+CRGB neopixels[NEOPIXEL_COUNT];
 
 Pixels flamePixels{
-    .count = FLAME_COUNT,
-    .colors = &neopixels[FLAME_COUNT]}; // we can select subsets of pixels like this
+    .count = 1,
+    .colors = &neopixels[3]};
 
 void setup()
 {
@@ -103,23 +105,14 @@ void setup()
     randomSeed(micros());
 
     setupNeopixels<NEOPIXEL_PIN>(neopixels, NEOPIXEL_COUNT, true, 32);
-
-    for (int i = 0; i < FLAME_COUNT; i++)
-    {
-        flames[i].lit = true;
-        flames[i].burnedPerMs = 1;
-    }
 }
 
 void loop()
 {
     timeEllapsed(&time);
-    for (int i = 0; i < FLAME_COUNT; i++)
-    {
-        flameBurnsMagic(&flames[i], &fuel, time);
-        flameBrightnessChanges(&flames[i], time);
-        flameOnPixel(flames[i], &flamePixels, i);
-    }
+    flameBurnsMagic(&flame, &fuel, time);
+    flameBrightnessChanges(&flame, time);
+    flameOnPixel(flame, &flamePixels, 0);
 
     EVERY_N_MILLIS(750)
     {

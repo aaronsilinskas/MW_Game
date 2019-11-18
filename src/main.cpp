@@ -54,7 +54,7 @@ void flameBrightnessChanges(Flame *flame, Time &time)
         }
         else
         {
-            flame->brightness -= random(192);
+            flame->brightness -= random(255);
         }
     }
     else if (flame->brightness > 0)
@@ -71,34 +71,30 @@ void flameBrightnessChanges(Flame *flame, Time &time)
     }
 }
 
-void flameOnPixels(Flame &flame, Pixels *pixels)
+void flameOnPixel(Flame &flame, Pixels *pixels, int index)
 {
-    for (int i = 0; i < pixels->count; i++) {
-        pixels->colors[i] = CRGB::Yellow;
-    }
-    nscale8(pixels->colors, pixels->count, flame.brightness);
+    pixels->colors[index] = CRGB::Yellow;
+    pixels->colors[index] = pixels->colors[index].nscale8(flame.brightness);
 }
 
 /////////////////////////// Entity
 
 Time time;
 
-Flame flame{
-    .lit = true,
-    .brightness = 0,
-    .burnedPerMs = 1};
+const uint8_t FLAME_COUNT = 3;
+Flame flames[FLAME_COUNT];
 
 Magic fuel{
     .type = Fire,
-    .amount = 10000};
+    .amount = 15000 * FLAME_COUNT};
 
 #define NEOPIXEL_PIN 5
 const uint16_t NEOPIXEL_COUNT = 12;
 CRGB neopixels[NEOPIXEL_COUNT]; //  = {CRGB::Red, CRGB::Green, CRGB::Blue};
 
 Pixels flamePixels{
-    .count = 3,
-    .colors = &neopixels[3]}; // we can select subsets of pixels like this
+    .count = FLAME_COUNT,
+    .colors = &neopixels[FLAME_COUNT]}; // we can select subsets of pixels like this
 
 void setup()
 {
@@ -107,14 +103,23 @@ void setup()
     randomSeed(micros());
 
     setupNeopixels<NEOPIXEL_PIN>(neopixels, NEOPIXEL_COUNT, true, 32);
+
+    for (int i = 0; i < FLAME_COUNT; i++)
+    {
+        flames[i].lit = true;
+        flames[i].burnedPerMs = 1;
+    }
 }
 
 void loop()
 {
     timeEllapsed(&time);
-    flameBurnsMagic(&flame, &fuel, time);
-    flameBrightnessChanges(&flame, time);
-    flameOnPixels(flame, &flamePixels);
+    for (int i = 0; i < FLAME_COUNT; i++)
+    {
+        flameBurnsMagic(&flames[i], &fuel, time);
+        flameBrightnessChanges(&flames[i], time);
+        flameOnPixel(flames[i], &flamePixels, i);
+    }
 
     EVERY_N_MILLIS(750)
     {

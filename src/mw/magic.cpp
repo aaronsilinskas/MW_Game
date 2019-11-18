@@ -19,10 +19,10 @@ const char *magicTypeName(MagicType type)
     }
 }
 
-void printMagic(Stream *out, const char *name, Magic *magic)
+void printMagic(Stream *out, const char *name, Magic &magic)
 {
     out->printf("%s: %s - %d\n",
                 name,
-                magicTypeName(magic->type),
-                magic->amount);
+                magicTypeName(magic.type),
+                magic.amount);
 }

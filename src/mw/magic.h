@@ -23,6 +23,6 @@ typedef struct Magic
 
 } Magic;
 
-void printMagic(Stream *out, const char *name, Magic *magic);
+void printMagic(Stream *out, const char *name, Magic &magic);
 
 #endif

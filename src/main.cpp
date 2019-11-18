@@ -18,13 +18,13 @@ typedef struct Flame
 // should only take structs, no primitives
 // main state should be first word for easier discovery
 
-void flameBurnsMagic(Flame *flame, Magic *fuel, Time *time)
+void flameBurnsMagic(Flame *flame, Magic *fuel, Time &time)
 {
     if (!flame->lit)
     {
         return;
     }
-    uint64_t fuelBurned = flame->burnedPerMs * time->ellapsedMs;
+    uint64_t fuelBurned = flame->burnedPerMs * time.ellapsedMs;
     if (fuel->amount > fuelBurned)
     {
         fuel->amount -= fuelBurned;
@@ -36,13 +36,13 @@ void flameBurnsMagic(Flame *flame, Magic *fuel, Time *time)
     }
 }
 
-void flameBrightnessChanges(Flame *flame, Time *time)
+void flameBrightnessChanges(Flame *flame, Time &time)
 {
     if (flame->lit)
     {
         if (flame->brightness < 255)
         {
-            uint32_t brighten = 255 * time->ellapsedMs / 1000;
+            uint32_t brighten = 255 * time.ellapsedMs / 1000;
             if (flame->brightness + brighten < 255)
             {
                 flame->brightness += brighten;
@@ -59,7 +59,7 @@ void flameBrightnessChanges(Flame *flame, Time *time)
     }
     else if (flame->brightness > 0)
     {
-        uint32_t dim = 255 * time->ellapsedMs / 5000; // go out in 5 seconds
+        uint32_t dim = 255 * time.ellapsedMs / 5000; // go out in 5 seconds
         if (flame->brightness > dim)
         {
             flame->brightness -= dim;
@@ -71,12 +71,12 @@ void flameBrightnessChanges(Flame *flame, Time *time)
     }
 }
 
-void flameOnPixels(Flame *flame, Pixels *pixels, Time *time)
+void flameOnPixels(Flame &flame, Pixels *pixels)
 {
     for (int i = 0; i < pixels->count; i++) {
         pixels->colors[i] = CRGB::Yellow;
     }
-    nscale8(pixels->colors, pixels->count, flame->brightness);
+    nscale8(pixels->colors, pixels->count, flame.brightness);
 }
 
 /////////////////////////// Entity
@@ -90,7 +90,7 @@ Flame flame{
 
 Magic fuel{
     .type = Fire,
-    .amount = 5000};
+    .amount = 10000};
 
 #define NEOPIXEL_PIN 5
 const uint16_t NEOPIXEL_COUNT = 12;
@@ -112,13 +112,13 @@ void setup()
 void loop()
 {
     timeEllapsed(&time);
-    flameBurnsMagic(&flame, &fuel, &time);
-    flameBrightnessChanges(&flame, &time);
-    flameOnPixels(&flame, &flamePixels, &time);
+    flameBurnsMagic(&flame, &fuel, time);
+    flameBrightnessChanges(&flame, time);
+    flameOnPixels(flame, &flamePixels);
 
     EVERY_N_MILLIS(750)
     {
-        printMagic(&Serial, "Fuel remaining", &fuel);
+        printMagic(&Serial, "Fuel remaining", fuel);
     }
 
     FastLED.show();

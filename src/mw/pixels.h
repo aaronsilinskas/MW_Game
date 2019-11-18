@@ -23,7 +23,7 @@ void setupNeopixels(CRGB *pixels, int count, bool dither, uint8_t brightness)
     FastLED.show();
 }
 
-void printColor(Stream *out, CRGB *color);
-void printPixels(Stream *out, Pixels *pixels);
+void printColor(Stream *out, CRGB &color);
+void printPixels(Stream *out, Pixels &pixels);
 
 #endif

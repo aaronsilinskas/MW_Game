@@ -23,6 +23,17 @@ typedef struct Magic
 
 } Magic;
 
+typedef struct MagicList
+{
+    Magic magic;
+    Magic *next;
+} MagicList;
+
+typedef struct MagicStorage
+{
+    MagicList *first;
+} MagicStorage;
+
 void printMagic(Stream *out, const char *name, Magic &magic);
 
 #endif

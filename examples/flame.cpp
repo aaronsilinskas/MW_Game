@@ -1,18 +1,10 @@
-/* lamp.cpp Example sketch for a lamp
+/* flame.cpp Example sketch for a flame
  */
 #include <Arduino.h>
 #include <mw/time.h>
 #include <mw/magic.h>
 #include <mw/pixels.h>
 #include <mw/flame.h>
-
-/////////////////////////// State
-
-
-/////////////////////////// Behaviors
-
-
-/////////////////////////// Entity
 
 Time time;
 

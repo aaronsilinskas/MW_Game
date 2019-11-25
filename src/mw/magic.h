@@ -23,15 +23,12 @@ typedef struct Magic
 
 } Magic;
 
-typedef struct MagicList
-{
-    Magic magic;
-    Magic *next;
-} MagicList;
+#define MAGIC_TYPES_PER_STORAGE 4
 
 typedef struct MagicStorage
 {
-    MagicList *first;
+    Magic magics[MAGIC_TYPES_PER_STORAGE];
+
 } MagicStorage;
 
 void printMagic(Stream *out, const char *name, Magic &magic);

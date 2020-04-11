@@ -5,8 +5,8 @@
 
 typedef struct Time
 {
-    uint64_t currentTimeMs;
-    uint64_t ellapsedMs;
+    uint64_t currentTimeMs = 0;
+    uint64_t ellapsedMs = 0;
 } Time;
 
 void timeEllapsed(Time *time);

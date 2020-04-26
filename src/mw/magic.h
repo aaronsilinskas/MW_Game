@@ -5,11 +5,14 @@
 
 typedef enum MagicType
 {
+    None,
     Fire,
     Water,
+    Lightning,
     Air,
     Earth,
-    Lightning
+    Matter,
+    Light
 } MagicType;
 
 const char *magicTypeName(MagicType type);
@@ -22,6 +25,10 @@ typedef struct Magic
     MagicAmount amount;
 
 } Magic;
+
+uint8_t magicBitmask(MagicType type);
+MagicType bitmaskToMagic(uint8_t bitmask);
+MagicType combineMagic(MagicType type1, MagicType type2);
 
 #define MAGIC_TYPES_PER_STORAGE 4
 

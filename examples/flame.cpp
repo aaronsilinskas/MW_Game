@@ -39,7 +39,7 @@ void loop()
     timeEllapsed(&time);
     flameBurnsMagic(&flame, &fuel, time);
     flameBrightnessChanges(&flame, time);
-    CRGB flameColor = colorFromMagic(fuel);
+    CRGB flameColor = colorFromMagic(fuel.type);
     flameOnPixel(flame, flameColor, &flamePixels, 0);
 
     EVERY_N_MILLIS(750)

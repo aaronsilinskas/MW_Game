@@ -24,7 +24,7 @@ void setupNeopixels(CRGB *pixels, int count, bool dither, uint8_t brightness)
     FastLED.show();
 }
 
-CRGB colorFromMagic(Magic &magic);
+CRGB colorFromMagic(MagicType magicType);
 
 void printColor(Stream *out, CRGB &color);
 void printPixels(Stream *out, Pixels &pixels);

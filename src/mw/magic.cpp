@@ -74,7 +74,8 @@ MagicType bitmaskToMagic(uint8_t bitmask)
 
 MagicType combineMagic(MagicType type1, MagicType type2)
 {
-    if (type1 == type2) {
+    if (type1 == type2)
+    {
         return type1;
     }
 

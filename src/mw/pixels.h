@@ -4,10 +4,6 @@
 #include <FastLED.h>
 #include "magic.h"
 
-#ifndef MWPIN_NEOPIXEL
-#define MWPIN_NEOPIXEL 5
-#endif
-
 typedef struct Pixels
 {
     uint16_t count;
@@ -23,8 +19,6 @@ void setupNeopixels(CRGB *pixels, int count, bool dither, uint8_t brightness)
     FastLED.setBrightness(brightness);
     FastLED.show();
 }
-
-CRGB colorFromMagic(MagicType magicType);
 
 void printColor(Stream *out, CRGB &color);
 void printPixels(Stream *out, Pixels &pixels);

@@ -4,6 +4,7 @@
 #include <mw/time.h>
 #include <mw/pixels.h>
 #include <mw/magic.h>
+#include <mw/pixels_magic.h>
 
 // General
 Time time;
@@ -15,6 +16,7 @@ Time time;
 
 // LEDs
 #define NEOPIXEL_PIN 5
+#define NEOPIXEL_BRIGHTNESS 32
 const uint16_t NEOPIXEL_COUNT = 12;
 CRGB neopixels[NEOPIXEL_COUNT];
 
@@ -49,7 +51,7 @@ void setup()
     randomSeed(micros());
 
     setupButtons();
-    setupNeopixels<NEOPIXEL_PIN>(neopixels, NEOPIXEL_COUNT, true, 32);
+    setupNeopixels<NEOPIXEL_PIN>(neopixels, NEOPIXEL_COUNT, true, NEOPIXEL_BRIGHTNESS);
     setupMagic();
 }
 
@@ -88,7 +90,7 @@ void addMagic(MagicType magic)
     if (magicSteps == 0)
     {
         selectedMagic = magic;
-        updatePixelsForMagic(1, colorFromMagic(selectedMagic));
+        updatePixelsForMagic(1, colorForMagic(selectedMagic));
         magicSteps++;
     }
     else if (magicSteps == 1)
@@ -107,14 +109,14 @@ void addMagic(MagicType magic)
         }
         else
         {
-            updatePixelsForMagic(2, colorFromMagic(selectedMagic));
+            updatePixelsForMagic(2, colorForMagic(selectedMagic));
             magicSteps++;
         }
     }
     else
     {
         castType = magic;
-        updatePixelsForMagic(3, colorFromMagic(castType));
+        updatePixelsForMagic(3, colorForMagic(castType));
         magicSteps++;
     }
 }
@@ -133,8 +135,22 @@ void castSpell()
 
 void loop()
 {
+    // TESTING PALETTES
+    // TODO change pixel colors to all use palette
+    static uint8_t colorIndex = 0;
+    colorIndex++;
+    MagicType testMagic = Fire;
+    neopixels[5] = ColorFromPalette(*paletteForMagic(testMagic), colorIndex, 255, LINEARBLEND);
+    neopixels[6] = ColorFromPalette(*paletteForMagic(testMagic), colorIndex + 64, 255, LINEARBLEND);
+    neopixels[7] = ColorFromPalette(*paletteForMagic(testMagic), colorIndex + 128, 255, LINEARBLEND);
+    neopixels[8] = ColorFromPalette(*paletteForMagic(testMagic), colorIndex + 192, 255, LINEARBLEND);
+
     timeEllapsed(&time);
 
+    // if ready for input, read buttons
+    // update state (magic charge, decay, casting)
+    // update pixel animations
+    // update sounds
     if (nextActionMs < time.currentTimeMs)
     {
         if (buttonPressed(PIN_BUTTON_FIRE))
@@ -159,5 +175,5 @@ void loop()
     }
 
     FastLED.show();
-    FastLED.delay(20);
+    FastLED.delay(40);
 }

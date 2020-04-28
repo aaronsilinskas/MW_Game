@@ -5,7 +5,7 @@
 #include "magic.h"
 
 CRGB colorForMagic(MagicType magicType);
-const TProgmemRGBPalette16* paletteForMagic(MagicType magicType);
+const TProgmemRGBPalette16 *paletteForMagic(MagicType magicType);
 
 // Magic color palettes
 extern const TProgmemRGBPalette16 NoneColors_p FL_PROGMEM;

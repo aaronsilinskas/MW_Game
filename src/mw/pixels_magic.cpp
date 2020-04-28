@@ -75,10 +75,10 @@ extern const TProgmemRGBPalette16 AirColors_p FL_PROGMEM = {
     CRGB::Purple, CRGB::DarkMagenta, CRGB::Maroon, CRGB::White,
     CRGB::Purple, CRGB::DarkMagenta, CRGB::Maroon, CRGB::White};
 extern const TProgmemRGBPalette16 EarthColors_p FL_PROGMEM = {
-    CRGB::Green, CRGB::DarkGreen, CRGB::Goldenrod, CRGB::BurlyWood,
-    CRGB::Green, CRGB::DarkGreen, CRGB::Goldenrod, CRGB::BurlyWood,
-    CRGB::Green, CRGB::DarkGreen, CRGB::Goldenrod, CRGB::BurlyWood,
-    CRGB::Green, CRGB::DarkGreen, CRGB::Goldenrod, CRGB::BurlyWood};
+    CRGB::Green, CRGB::SaddleBrown, CRGB::DarkGreen, CRGB::DarkOrange,
+    CRGB::Green, CRGB::DarkKhaki, CRGB::DarkGreen, CRGB::DarkOrange,
+    CRGB::Green, CRGB::SaddleBrown, CRGB::DarkGreen, CRGB::DarkOrange,
+    CRGB::Green, CRGB::DarkKhaki, CRGB::DarkGreen, CRGB::DarkOrange};
 extern const TProgmemRGBPalette16 MatterColors_p FL_PROGMEM = {
     CRGB::OrangeRed, CRGB::DarkOrange, CRGB::Black, CRGB::Yellow,
     CRGB::OrangeRed, CRGB::DarkOrange, CRGB::Black, CRGB::Yellow,

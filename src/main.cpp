@@ -6,23 +6,23 @@
 #include <mw/magic.h>
 #include <mw/pixels_magic.h>
 
-// General
-Time time;
-
-// Buttons
+// Buttons //
 #define PIN_BUTTON_FIRE A3
 #define PIN_BUTTON_WATER A4
 #define PIN_BUTTON_LIGHTING A5
 
-// LEDs
+// LEDs //
 #define NEOPIXEL_PIN 5
 #define NEOPIXEL_BRIGHTNESS 32
 const uint16_t NEOPIXEL_COUNT = 12;
 CRGB neopixels[NEOPIXEL_COUNT];
 
 Pixels pixels{
-    .count = 3,
+    .count = NEOPIXEL_COUNT,
     .colors = &neopixels[0]};
+
+// Game State //
+Time time;
 
 MagicType selectedMagic;
 MagicType castType;
@@ -133,17 +133,29 @@ void castSpell()
     magicSteps = 0;
 }
 
+void testPalette(MagicType magicType)
+{
+    static bool initialized = false;
+    static uint8_t colorIndex[NEOPIXEL_COUNT];
+    if (!initialized)
+    {
+        initialized = true;
+        for (int i = 0; i < NEOPIXEL_COUNT; i++)
+        {
+            colorIndex[i] += random(256);
+        }
+    }
+    for (int i = 3; i < NEOPIXEL_COUNT; i++)
+    {
+        colorIndex[i] += random(4);
+        pixels.colors[i] = ColorFromPalette(*paletteForMagic(magicType), colorIndex[i], 255, LINEARBLEND);
+    }
+}
+
 void loop()
 {
-    // TESTING PALETTES
-    // TODO change pixel colors to all use palette
-    static uint8_t colorIndex = 0;
-    colorIndex++;
-    MagicType testMagic = Fire;
-    neopixels[5] = ColorFromPalette(*paletteForMagic(testMagic), colorIndex, 255, LINEARBLEND);
-    neopixels[6] = ColorFromPalette(*paletteForMagic(testMagic), colorIndex + 64, 255, LINEARBLEND);
-    neopixels[7] = ColorFromPalette(*paletteForMagic(testMagic), colorIndex + 128, 255, LINEARBLEND);
-    neopixels[8] = ColorFromPalette(*paletteForMagic(testMagic), colorIndex + 192, 255, LINEARBLEND);
+    // TODO remove - for testing
+    testPalette(Fire);
 
     timeEllapsed(&time);
 

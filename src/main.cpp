@@ -24,6 +24,22 @@ Pixels pixels{
 // Game State //
 Time time;
 
+BasicAnimation magicAnimation{
+    .pixels = &pixels,
+    .minIncrement = 0,
+    .maxIncrement = 4};
+
+enum GameState
+{
+    WaitingForPlayer,
+    ButtonPressed,
+    CorrectButton,
+    IncorrectButton,
+    WaitingForRelease,
+    Unlocked
+};
+GameState gameState;
+
 MagicType selectedMagic;
 MagicType castType;
 uint8_t magicSteps;
@@ -133,29 +149,11 @@ void castSpell()
     magicSteps = 0;
 }
 
-void testPalette(MagicType magicType)
-{
-    static bool initialized = false;
-    static uint8_t colorIndex[NEOPIXEL_COUNT];
-    if (!initialized)
-    {
-        initialized = true;
-        for (int i = 0; i < NEOPIXEL_COUNT; i++)
-        {
-            colorIndex[i] += random(256);
-        }
-    }
-    for (int i = 3; i < NEOPIXEL_COUNT; i++)
-    {
-        colorIndex[i] += random(4);
-        pixels.colors[i] = ColorFromPalette(*paletteForMagic(magicType), colorIndex[i], 255, LINEARBLEND);
-    }
-}
-
 void loop()
 {
     // TODO remove - for testing
-    testPalette(Fire);
+    const TProgmemRGBPalette16 *palette = paletteForMagic(Fire);
+    basicAnimation(palette, &magicAnimation);
 
     timeEllapsed(&time);
 

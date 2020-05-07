@@ -44,7 +44,7 @@ MagicType selectedMagic;
 MagicType castType;
 uint8_t magicSteps;
 
-#define ACTION_DELAY 750
+#define ACTION_DELAY 500
 uint64_t nextActionMs;
 
 void setupButtons()
@@ -76,37 +76,11 @@ bool buttonPressed(uint32_t pin)
     return digitalRead(pin) == 0;
 }
 
-void updatePixelsForMagic(uint8_t steps, CRGB color)
-{
-    if (steps == 0)
-    {
-        for (int i = 0; i < pixels.count; i++)
-        {
-            pixels.colors[i] = color;
-        }
-        return;
-    }
-    else if (steps == 1)
-    {
-        pixels.colors[0] = color;
-    }
-    else if (steps == 2)
-    {
-        pixels.colors[0] = color;
-        pixels.colors[1] = color;
-    }
-    else
-    {
-        pixels.colors[2] = color;
-    }
-}
-
 void addMagic(MagicType magic)
 {
     if (magicSteps == 0)
     {
         selectedMagic = magic;
-        updatePixelsForMagic(1, colorForMagic(selectedMagic));
         magicSteps++;
     }
     else if (magicSteps == 1)
@@ -120,19 +94,17 @@ void addMagic(MagicType magic)
         selectedMagic = combineMagic(selectedMagic, magic);
         if (selectedMagic == None)
         {
-            updatePixelsForMagic(0, CRGB::Black);
             magicSteps = 0;
         }
         else
         {
-            updatePixelsForMagic(2, colorForMagic(selectedMagic));
             magicSteps++;
         }
     }
     else
     {
         castType = magic;
-        updatePixelsForMagic(3, colorForMagic(castType));
+        selectedMagic = None;
         magicSteps++;
     }
 }
@@ -152,7 +124,7 @@ void castSpell()
 void loop()
 {
     // TODO remove - for testing
-    const TProgmemRGBPalette16 *palette = paletteForMagic(Fire);
+    const TProgmemRGBPalette16 *palette = paletteForMagic(selectedMagic);
     basicAnimation(palette, &magicAnimation);
 
     timeEllapsed(&time);

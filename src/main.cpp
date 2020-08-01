@@ -1,10 +1,12 @@
-/* Tool 3 prototype
+/* Tool 3 Hardware Test
  */
 #include <Arduino.h>
+#include <Adafruit_DotStar.h>
 #include <mw/time.h>
 #include <mw/pixels.h>
-#include <mw/magic.h>
-#include <mw/pixels_magic.h>
+
+// Built-in Dot for status
+Adafruit_DotStar statusDot(1, 41, 40, DOTSTAR_BGR);
 
 // Buttons //
 #define PIN_BUTTON_FIRE A3
@@ -24,137 +26,55 @@ Pixels pixels{
 // Game State //
 Time time;
 
-BasicAnimation magicAnimation{
-    .pixels = &pixels,
-    .minIncrement = 0,
-    .maxIncrement = 4};
-
-enum GameState
+void setStatus(uint8_t r, uint8_t g, uint8_t b)
 {
-    WaitingForPlayer,
-    ButtonPressed,
-    CorrectButton,
-    IncorrectButton,
-    WaitingForRelease,
-    Unlocked
-};
-GameState gameState;
-
-MagicType selectedMagic;
-MagicType castType;
-uint8_t magicSteps;
-
-#define ACTION_DELAY 500
-uint64_t nextActionMs;
-
-void setupButtons()
-{
-    pinMode(PIN_BUTTON_FIRE, INPUT_PULLUP);
-    pinMode(PIN_BUTTON_WATER, INPUT_PULLUP);
-    pinMode(PIN_BUTTON_LIGHTING, INPUT_PULLUP);
+    statusDot.setPixelColor(0, r, g, b);
+    statusDot.show();
 }
 
-void setupMagic()
+void clearStatus()
 {
-    magicSteps = 0;
-    nextActionMs = 0;
+    setStatus(0, 0, 0);
+}
+
+void blinkUntilReady()
+{
+    bool on = true;
+    while (!Serial)
+    {
+        if (on)
+        {
+            setStatus(255, 192, 0);
+        }
+        else
+        {
+            clearStatus();
+        }
+        delay(500);
+        on = !on;
+    }
 }
 
 void setup()
 {
+    statusDot.begin();
+    statusDot.setBrightness(50);
+
+    blinkUntilReady();
+    clearStatus();
+
+    digitalWrite(LED_BUILTIN, HIGH);
+
     Serial.begin(9600);
 
     randomSeed(micros());
 
-    setupButtons();
     setupNeopixels<NEOPIXEL_PIN>(neopixels, NEOPIXEL_COUNT, true, NEOPIXEL_BRIGHTNESS);
-    setupMagic();
-}
-
-bool buttonPressed(uint32_t pin)
-{
-    return digitalRead(pin) == 0;
-}
-
-void addMagic(MagicType magic)
-{
-    if (magicSteps == 0)
-    {
-        selectedMagic = magic;
-        magicSteps++;
-    }
-    else if (magicSteps == 1)
-    {
-        Serial.print(magicTypeName(selectedMagic));
-        Serial.print(" + ");
-        Serial.print(magicTypeName(magic));
-        Serial.print(" = ");
-        Serial.println(magicTypeName(combineMagic(selectedMagic, magic)));
-
-        selectedMagic = combineMagic(selectedMagic, magic);
-        if (selectedMagic == None)
-        {
-            magicSteps = 0;
-        }
-        else
-        {
-            magicSteps++;
-        }
-    }
-    else
-    {
-        castType = magic;
-        selectedMagic = None;
-        magicSteps++;
-    }
-}
-
-bool spellComplete()
-{
-    return magicSteps >= 3;
-}
-
-void castSpell()
-{
-    // TODO cast the spell based on selectedMagic and castType
-
-    magicSteps = 0;
 }
 
 void loop()
 {
-    // TODO remove - for testing
-    const TProgmemRGBPalette16 *palette = paletteForMagic(selectedMagic);
-    basicAnimation(palette, &magicAnimation);
-
     timeEllapsed(&time);
-
-    // if ready for input, read buttons
-    // update state (magic charge, decay, casting)
-    // update pixel animations
-    // update sounds
-    if (nextActionMs < time.currentTimeMs)
-    {
-        if (buttonPressed(PIN_BUTTON_FIRE))
-        {
-            addMagic(Fire);
-            nextActionMs = time.currentTimeMs + ACTION_DELAY;
-        }
-        else if (buttonPressed(PIN_BUTTON_WATER))
-        {
-            addMagic(Water);
-            nextActionMs = time.currentTimeMs + ACTION_DELAY;
-        }
-        else if (buttonPressed(PIN_BUTTON_LIGHTING))
-        {
-            addMagic(Lightning);
-            nextActionMs = time.currentTimeMs + ACTION_DELAY;
-        }
-    }
-    if (spellComplete())
-    {
-        castSpell();
-    }
 
     FastLED.show();
     FastLED.delay(40);

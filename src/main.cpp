@@ -37,7 +37,7 @@ void clearStatus()
     setStatus(0, 0, 0);
 }
 
-void blinkUntilReady()
+void blinkStatusUntilSerialReady()
 {
     bool on = true;
     while (!Serial)
@@ -53,6 +53,7 @@ void blinkUntilReady()
         delay(500);
         on = !on;
     }
+    clearStatus();
 }
 
 void setup()
@@ -60,12 +61,10 @@ void setup()
     statusDot.begin();
     statusDot.setBrightness(50);
 
-    blinkUntilReady();
-    clearStatus();
-
-    digitalWrite(LED_BUILTIN, HIGH);
+    blinkStatusUntilSerialReady();
 
     Serial.begin(9600);
+    Serial.println("Hardware diagnostics starting...");
 
     randomSeed(micros());
 

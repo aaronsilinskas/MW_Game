@@ -1,12 +1,8 @@
 /* Tool 3 Hardware Test
  */
 #include <Arduino.h>
-#include <Adafruit_DotStar.h>
 #include <mw/time.h>
 #include <mw/pixels.h>
-
-// Built-in Dot for status
-Adafruit_DotStar statusDot(1, 41, 40, DOTSTAR_BGR);
 
 // Buttons //
 #define PIN_BUTTON_FIRE A3
@@ -26,47 +22,34 @@ Pixels pixels{
 // Game State //
 Time time;
 
-void setStatus(uint8_t r, uint8_t g, uint8_t b)
+void blinkUntilSerialReady()
 {
-    statusDot.setPixelColor(0, r, g, b);
-    statusDot.show();
-}
-
-void clearStatus()
-{
-    setStatus(0, 0, 0);
-}
-
-void blinkStatusUntilSerialReady()
-{
+    pinMode(LED_BUILTIN, OUTPUT);
     bool on = true;
     while (!Serial)
     {
-        if (on)
-        {
-            setStatus(255, 192, 0);
-        }
-        else
-        {
-            clearStatus();
-        }
+        digitalWrite(LED_BUILTIN, on ? HIGH : LOW);
         delay(500);
         on = !on;
     }
-    clearStatus();
+    digitalWrite(LED_BUILTIN, LOW);
 }
 
 void setup()
 {
-    statusDot.begin();
-    statusDot.setBrightness(50);
-
-    blinkStatusUntilSerialReady();
+    blinkUntilSerialReady();
 
     Serial.begin(9600);
     Serial.println("Hardware diagnostics starting...");
 
     randomSeed(micros());
+
+    // TODO - DFPlayer
+    // TODO - IMU connect
+    // TODO - IR send
+    // TODO - NeoPixels
+    // TODO - buttons
+    // TODO - potentiometer
 
     setupNeopixels<NEOPIXEL_PIN>(neopixels, NEOPIXEL_COUNT, true, NEOPIXEL_BRIGHTNESS);
 }
